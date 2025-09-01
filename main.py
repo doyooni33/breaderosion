@@ -10,7 +10,7 @@ screen = pygame.display.set_mode((screen_width,screen_height) , pygame.RESIZABLE
 
 clock = pygame.time.Clock()
 
-MapSize = (1000,1000)
+MapSize = (2500,3000)
 
 MAIN_BREAD = pygame.image.load('.\img\main_bread.png')
 main_bread = MAIN_BREAD #화질이 깨져서 원본 하나 해두고 복사본을 바꾸면서 쓰기
@@ -21,7 +21,15 @@ class mold: #곰팡이
     def __init__(self):
         self.HeadPos = (500,500)
         self.micomolds:list[micomold] = []
-        
+    def w(self):
+        self.HeadPos[1]+=0.5
+    def a(self):
+        self.HeadPos[0]-=0.5
+    def s(self):
+        self.HeadPos[1]-=0.5
+    def d(self):
+        self.HeadPos[0]+=0.5
+
 class micomold: #곰팡이 노비
     def __init__(self,rating):
         self.Pos = (0,0)
@@ -32,6 +40,11 @@ class antiseptic: #방부제
         self.Pos = (0,0)
 
 
+HEADMOLD = mold()
+micomolds:list[micomold] = []
+antiseptics:list[antiseptic] = []
+
+camPos = (0,)
 
 running = True #역시 chat gptㅎㅎ 이거 제출 직전에 지워야됨
 while running:
@@ -46,7 +59,15 @@ while running:
             screen_width = new_width
             screen_height = new_height
             main_bread = pygame.transform.scale(MAIN_BREAD,(screen_width,screen_height))
-
+    pressed_key = pygame.key.get_pressed()
+    if pressed_key[pygame.K_w]:
+        HEADMOLD.w()
+    elif pressed_key[pygame.K_a]:
+        HEADMOLD.a()
+    elif pressed_key[pygame.K_s]:
+        HEADMOLD.s()
+    elif pressed_key[pygame.K_d]:
+        HEADMOLD.d()
     screen.fill((0,0,0))
     screen.blit(main_bread,(0,0))
     pygame.display.flip()
