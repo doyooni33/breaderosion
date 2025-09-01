@@ -60,6 +60,7 @@ while running:
             screen_height = new_height
             main_bread = pygame.transform.scale(MAIN_BREAD,(screen_width,screen_height))
     pressed_key = pygame.key.get_pressed()
+    camPos = HEADMOLD.HeadPos
     if pressed_key[pygame.K_w]:
         HEADMOLD.w()
     elif pressed_key[pygame.K_a]:
