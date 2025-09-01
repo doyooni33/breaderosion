@@ -21,6 +21,7 @@ class mold: #곰팡이
     def __init__(self):
         self.HeadPos = (500,500)
         self.micomolds:list[micomold] = []
+        
 class micomold: #곰팡이 노비
     def __init__(self,rating):
         self.Pos = (0,0)
