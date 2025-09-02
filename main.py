@@ -62,6 +62,13 @@ def move_headmold():
     elif pressed_key[pygame.K_d]:
         HEADMOLD.d()
         print("d")
+def get_img(progress):
+    if progress == 1:
+        return pygame.image.load('headmold_animation0001.png')
+    elif progress == 2:
+        return pygame.image.load('headmold_animation0002.png')
+    elif progress == 3:
+        return pygame.image.load('headmold_animation0003.png')
 loc = 0 #로비와 인게임 상태를 저장
 LOBBY = 0
 INGAME = 0
