@@ -44,8 +44,24 @@ HEADMOLD = mold()
 micomolds:list[micomold] = []
 antiseptics:list[antiseptic] = []
 
-camPos = (0,)
-
+camPos = [0,0]
+def move_headmold():
+    pressed_key = pygame.key.get_pressed()
+    if pressed_key[pygame.K_w]:
+        HEADMOLD.w()
+        print("w")
+    elif pressed_key[pygame.K_a]:
+        HEADMOLD.a()
+        print("a")
+    elif pressed_key[pygame.K_s]:
+        HEADMOLD.s()
+        print("s")
+    elif pressed_key[pygame.K_d]:
+        HEADMOLD.d()
+        print("d")
+loc = 0 #로비와 인게임 상태를 저장
+LOBBY = 0
+INGAME = 0
 running = True #역시 chat gptㅎㅎ 이거 제출 직전에 지워야됨
 while running:
     elapsed = clock.get_time()
@@ -59,31 +75,17 @@ while running:
             screen_width = new_width
             screen_height = new_height
             main_bread = pygame.transform.scale(MAIN_BREAD,(screen_width,screen_height))
-    pressed_key = pygame.key.get_pressed()
-    if pressed_key[pygame.K_w]:
-        HEADMOLD.w()
-    elif pressed_key[pygame.K_a]:
-        HEADMOLD.a()
-    elif pressed_key[pygame.K_s]:
-        HEADMOLD.s()
-    elif pressed_key[pygame.K_d]:
-        HEADMOLD.d()
 
-    camPos = HEADMOLD.HeadPos
     screen.fill((0,0,0))
+
+    if loc == LOBBY:
+        pass
+    elif loc == INGAME:
+        move_headmold()
+        camPos = HEADMOLD.HeadPos
     screen.blit(main_bread,(0,0))
     pygame.display.flip()
 
     clock.tick(60) #초당 60프레임
-
-while running:
-    elapsed = clock.get_time()
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-    pygame.display.flip()
-    screen.fill((0,0,0))
-
-    clock.tick(60)
 pygame.quit()
 print('도윤이바보멍청이')
