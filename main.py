@@ -38,6 +38,9 @@ class micomold: #곰팡이 노비
 class antiseptic: #방부제
     def __init__(self):
         self.Pos = (0,0)
+class tansuuuuuu:
+    def __init__(self):
+        pass
 
 
 HEADMOLD = mold()
