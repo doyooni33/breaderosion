@@ -1,3 +1,4 @@
+# main code 시작
 import pygame
 
 pygame.init()
