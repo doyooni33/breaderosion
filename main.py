@@ -19,7 +19,7 @@ main_bread = pygame.transform.scale(MAIN_BREAD,(screen_width,screen_height))
 
 class mold: #곰팡이
     def __init__(self):
-        self.HeadPos = (500,500)
+        self.HeadPos = [500,500]
         self.micomolds:list[micomold] = []
     def w(self):
         self.HeadPos[1]+=0.5
@@ -60,7 +60,6 @@ while running:
             screen_height = new_height
             main_bread = pygame.transform.scale(MAIN_BREAD,(screen_width,screen_height))
     pressed_key = pygame.key.get_pressed()
-    camPos = HEADMOLD.HeadPos
     if pressed_key[pygame.K_w]:
         HEADMOLD.w()
     elif pressed_key[pygame.K_a]:
@@ -69,6 +68,8 @@ while running:
         HEADMOLD.s()
     elif pressed_key[pygame.K_d]:
         HEADMOLD.d()
+
+    camPos = HEADMOLD.HeadPos
     screen.fill((0,0,0))
     screen.blit(main_bread,(0,0))
     pygame.display.flip()
