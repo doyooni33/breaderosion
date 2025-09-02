@@ -47,46 +47,43 @@ antiseptics:list[antiseptic] = []
 camPos = (0,)
 
 running = True #역시 chat gptㅎㅎ 이거 제출 직전에 지워야됨
-def lobby():
-    while running:
-        elapsed = clock.get_time()
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-            # 사용자가 창 크기를 변경했을 때 발생하는 이벤트 처리 (선택 사항)
-            elif event.type == pygame.VIDEORESIZE:
-                # 새로운 창 크기를 가져옵니다.
-                new_width, new_height = event.size
-                screen_width = new_width
-                screen_height = new_height
-                main_bread = pygame.transform.scale(MAIN_BREAD,(screen_width,screen_height))
-        pressed_key = pygame.key.get_pressed()
-        if pressed_key[pygame.K_w]:
-            HEADMOLD.w()
-        elif pressed_key[pygame.K_a]:
-            HEADMOLD.a()
-        elif pressed_key[pygame.K_s]:
-            HEADMOLD.s()
-        elif pressed_key[pygame.K_d]:
-            HEADMOLD.d()
+while running:
+    elapsed = clock.get_time()
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+        # 사용자가 창 크기를 변경했을 때 발생하는 이벤트 처리 (선택 사항)
+        elif event.type == pygame.VIDEORESIZE:
+            # 새로운 창 크기를 가져옵니다.
+            new_width, new_height = event.size
+            screen_width = new_width
+            screen_height = new_height
+            main_bread = pygame.transform.scale(MAIN_BREAD,(screen_width,screen_height))
+    pressed_key = pygame.key.get_pressed()
+    if pressed_key[pygame.K_w]:
+        HEADMOLD.w()
+    elif pressed_key[pygame.K_a]:
+        HEADMOLD.a()
+    elif pressed_key[pygame.K_s]:
+        HEADMOLD.s()
+    elif pressed_key[pygame.K_d]:
+        HEADMOLD.d()
 
-        camPos = HEADMOLD.HeadPos
-        screen.fill((0,0,0))
-        screen.blit(main_bread,(0,0))
-        pygame.display.flip()
+    camPos = HEADMOLD.HeadPos
+    screen.fill((0,0,0))
+    screen.blit(main_bread,(0,0))
+    pygame.display.flip()
 
-        clock.tick(60) #초당 60프레임
+    clock.tick(60) #초당 60프레임
 
-def ingame():
-    while running:
-        elapsed = clock.get_time()
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-        pygame.display.flip()
-        screen.fill((0,0,0))
+while running:
+    elapsed = clock.get_time()
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+    pygame.display.flip()
+    screen.fill((0,0,0))
 
-        clock.tick(60)
-lobby()
+    clock.tick(60)
 pygame.quit()
 print('도윤이바보멍청이')
