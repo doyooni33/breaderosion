@@ -1,4 +1,5 @@
 import pygame
+import time
 
 pygame.init()
 
@@ -12,15 +13,50 @@ clock = pygame.time.Clock()
 
 MapSize = (2500,3000)
 
-MAIN_BREAD = pygame.image.load('.\img\main_bread.png')
+MAIN_BREAD = pygame.image.load('./img/main_bread.png')
 main_bread = MAIN_BREAD #화질이 깨져서 원본 하나 해두고 복사본을 바꾸면서 쓰기
+HEADMOLD_IMG0001 = pygame.image.load('/animation_headmold/headmold_animation0001.png')
+meadmold_img0001 = HEADMOLD_IMG0001
+HEADMOLD_IMG0002 = pygame.image.load('/animation_headmold/headmold_animation0002.png')
+meadmold_img0002 = HEADMOLD_IMG0001
+HEADMOLD_IMG0003 = pygame.image.load('/animation_headmold/headmold_animation0003.png')
+meadmold_img0003 = HEADMOLD_IMG0001
 
 main_bread = pygame.transform.scale(MAIN_BREAD,(screen_width,screen_height))
 
-class mold: #곰팡이
+class type:
+    ANIMATION = 0
+    LIVING = 1
+    FOOD = 2
     def __init__(self):
+        self.type = ""
+class animation(type):
+    def __init__(self,fps):
+        self.type = type.ANIMATION
+        self.progress = 1
+        self.fps = fps
+        self.fftime = time.time() #처음 프레임이 나왔던 시간 'f'irst 'f'rame time
+    def get_animation(self):
+        if self.progress == 1:
+            return pygame.image.load('headmold_animation0001.png')
+        elif self.progress == 2:
+            return pygame.image.load('headmold_animation0002.png')
+        elif self.progress == 3:
+            return pygame.image.load('headmold_animation0003.png')
+    def update(self):
+        if time.time-self.fftime > 1/self.fps*self.progress:
+            if self.progress >= 3:
+                self.progress = 1
+            else:
+                self.progress +=1        
+        return self.get_animation()
+
+class mold(type): #곰팡이
+    def __init__(self):
+        self.type = type.LIVING
         self.HeadPos = [500,500]
         self.micomolds:list[micomold] = []
+        self.animation = animation(3)
     def w(self):
         self.HeadPos[1]+=0.5
     def a(self):
@@ -30,24 +66,36 @@ class mold: #곰팡이
     def d(self):
         self.HeadPos[0]+=0.5
 
-class micomold: #곰팡이 노비
+class micomold(type): #곰팡이 노비
     def __init__(self,rating):
-        self.Pos = (0,0)
+        self.type = type.LIVING
+        self.Pos = [0,0]
         self.helth = 100
+        self.animation = animation(3)
 
-class antiseptic: #방부제
+class antiseptic(type): #방부제
     def __init__(self):
-        self.Pos = (0,0)
-class tansuuuuuu:
+        self.type = type.LIVING
+        self.Pos = [0,0]
+        self.animation = animation(3)
+class tansuuuuuu(type): #탄수화물
     def __init__(self):
-        pass
+        self.type = type.FOOD
+        self.pos = [0,0]
+        self.animation = animation(3)
+        
+class dannnnnnnn(type): #단백질
+    def __init__(self):
+        self.type = type.FOOD
+        self.pos = [0,0]
+        self.animation = animation(3)
 
+class zzzzziiiii(type): #지방
+    def __init__(self):
+        self.type = type.FOOD
+        self.pos = [0,0]
+        self.animation = animation(3)
 
-HEADMOLD = mold()
-micomolds:list[micomold] = []
-antiseptics:list[antiseptic] = []
-
-camPos = [0,0]
 def move_headmold():
     pressed_key = pygame.key.get_pressed()
     if pressed_key[pygame.K_w]:
@@ -62,13 +110,13 @@ def move_headmold():
     elif pressed_key[pygame.K_d]:
         HEADMOLD.d()
         print("d")
-def get_img(progress):
-    if progress == 1:
-        return pygame.image.load('headmold_animation0001.png')
-    elif progress == 2:
-        return pygame.image.load('headmold_animation0002.png')
-    elif progress == 3:
-        return pygame.image.load('headmold_animation0003.png')
+
+HEADMOLD = mold()
+micomolds:list[micomold] = []
+antiseptics:list[antiseptic] = []
+
+camPos = [0,0]
+
 loc = 0 #로비와 인게임 상태를 저장
 LOBBY = 0
 INGAME = 0
@@ -78,9 +126,7 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        # 사용자가 창 크기를 변경했을 때 발생하는 이벤트 처리 (선택 사항)
         elif event.type == pygame.VIDEORESIZE:
-            # 새로운 창 크기를 가져옵니다.
             new_width, new_height = event.size
             screen_width = new_width
             screen_height = new_height
@@ -89,11 +135,11 @@ while running:
     screen.fill((0,0,0))
 
     if loc == LOBBY:
-        pass
+        screen.blit(main_bread,(0,0))
     elif loc == INGAME:
         move_headmold()
         camPos = HEADMOLD.HeadPos
-    screen.blit(main_bread,(0,0))
+        screen.blit()
     pygame.display.flip()
 
     clock.tick(60) #초당 60프레임
