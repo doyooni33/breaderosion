@@ -164,4 +164,4 @@ while running:
 
     clock.tick(60) #초당 60프레임
 pygame.quit()
-print('도윤이바보멍청이아님')
+print('도윤이바보멍청이아님이 맞음')
