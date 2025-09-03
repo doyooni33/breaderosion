@@ -47,7 +47,7 @@ class animation(type):
             return pygame.transform.scale(HEADMOLD_IMG0003,(width,height))
     def update(self,width,height):
         if time.time()-self.fftime > 1/self.fps*self.progress:
-            if self.progress >= 3:
+            if self.progress >= 1:
                 self.progress = 1
                 self.fftime = time.time()
             else:
