@@ -18,11 +18,18 @@ OneCellPerPx = max(screen_width,screen_height)/15
 MAIN_BREAD = pygame.image.load('./img/main_bread.png')
 main_bread = MAIN_BREAD #화질이 깨져서 원본 하나 해두고 복사본을 바꾸면서 쓰기
 HEADMOLD_IMG0001 = pygame.image.load('./animation_headmold/headmold_animation0001.png')
-meadmold_img0001 = HEADMOLD_IMG0001
+headmold_img0001 = HEADMOLD_IMG0001
 HEADMOLD_IMG0002 = pygame.image.load('./animation_headmold/headmold_animation0002.png')
-meadmold_img0002 = HEADMOLD_IMG0001
+headmold_img0002 = HEADMOLD_IMG0001
 HEADMOLD_IMG0003 = pygame.image.load('./animation_headmold/headmold_animation0003.png')
-meadmold_img0003 = HEADMOLD_IMG0001
+headmold_img0003 = HEADMOLD_IMG0001
+MICOMOLD_IMG0001 = pygame.image.load('./animation_headmold/micomold0001.png')
+micomold_img0001 = HEADMOLD_IMG0001
+MICOMOLD_IMG0002 = pygame.image.load('./animation_headmold/micomold0002.png')
+micomold_img0002 = HEADMOLD_IMG0002
+MICOMOLD_IMG0003 = pygame.image.load('./animation_headmold/micomold0003.png')
+micomold_img0003 = HEADMOLD_IMG0003
+
 
 main_bread = pygame.transform.scale(MAIN_BREAD,(screen_width,screen_height))
 
@@ -33,21 +40,34 @@ class type:
     def __init__(self):
         self.type = ""
 class animation(type):
-    def __init__(self,fps):
+    HEADMOLD_ANI = 0
+    MICOMOLD_ANI = 1
+    ANTISEPTIC_ANI = 2
+    def __init__(self,type_,fps):
         self.type = type.ANIMATION
+        self.anitype = type_
         self.progress = 1
         self.fps = fps
         self.fftime = time.time() #처음 프레임이 나왔던 시간 'f'irst 'f'rame time
     def get_animation(self,width,height):
-        if self.progress == 1:
-            return pygame.transform.scale(HEADMOLD_IMG0001,(width,height))
-        elif self.progress == 2:
-            return pygame.transform.scale(HEADMOLD_IMG0002,(width,height))
-        elif self.progress == 3:
-            return pygame.transform.scale(HEADMOLD_IMG0003,(width,height))
+        if self.anitype == self.HEADMOLD_ANI:
+            if self.progress == 1:
+                return pygame.transform.scale(HEADMOLD_IMG0001,(width,height))
+            elif self.progress == 2:
+                return pygame.transform.scale(HEADMOLD_IMG0002,(width,height))
+            elif self.progress == 3:
+                return pygame.transform.scale(HEADMOLD_IMG0003,(width,height))
+        elif self.anitype == self.MICOMOLD_ANI:
+            if self.progress == 1:
+                return pygame.transform.scale(MICOMOLD_IMG0001,(width,height))
+            elif self.progress == 2:
+                return pygame.transform.scale(MICOMOLD_IMG0002,(width,height))
+            elif self.progress == 3:
+                return pygame.transform.scale(MICOMOLD_IMG0003,(width,height))
+
     def update(self,width,height):
         if time.time()-self.fftime > 1/self.fps*self.progress:
-            if self.progress >= 1:
+            if self.progress >= 3:
                 self.progress = 1
                 self.fftime = time.time()
             else:
@@ -59,7 +79,7 @@ class mold(type): #곰팡이
         self.type = type.LIVING
         self.HeadPos = [500,500]
         self.micomolds:list[micomold] = []
-        self.animation = animation(3)
+        self.animation = animation(animation.HEADMOLD_ANI,3)
     def w(self):
         self.HeadPos[1]-=0.5
     def a(self):
@@ -70,11 +90,11 @@ class mold(type): #곰팡이
         self.HeadPos[0]+=0.5
 
 class micomold(type): #곰팡이 노비
-    def __init__(self,rating):
+    def __init__(self,rating,pos):
         self.type = type.LIVING
-        self.Pos = [0,0]
+        self.Pos = pos
         self.helth = 100
-        self.animation = animation(3)
+        self.animation = animation(animation.MICOMOLD_ANI,3)
 
 class antiseptic(type): #방부제
     def __init__(self):
@@ -123,19 +143,25 @@ def AddCamPos(list):
 def controlForCenter(list): #위치를 화면 가운데로 만들기 위한 함수
     return [list[0]+screen_width/2,list[1]+screen_height/2]
 
-def controlForCenter2(list): #중심부분이 위치가 되도록 만들기 위한 함수
-    return [list[0]/2,list[1]+screen_height/2]
+def controlForCenter2(list,width,height):
+    return [list[0]-width/2,list[1]-height/2]
 
-def get_posforscreen(list): #
-    return ToTuple(controlForCenter(AddCamPos(list)))
-
-def checkEdgeItemOver():
-
-    return 
-
+def get_posforscreen(list,img_width,img_height):
+    re = list
+    re = AddCamPos(re)
+    re = controlForCenter(re)
+    re = controlForCenter2(re,img_width,img_height)
+    re = ToTuple(re)
+    return re
+def get_posforscreen2(pos,img_width,img_height):
+    re = pos
+    re = AddCamPos(re)
+    re = controlForCenter2(re,img_width,img_height)
+    re = ToTuple(re)
+    return re
 
 HEADMOLD = mold()
-micomolds:list[micomold] = []
+micomolds:list[micomold] = [micomold(1,[450,450])]
 antiseptics:list[antiseptic] = []
 
 camPos = [0,0]
@@ -161,11 +187,13 @@ while running:
         screen.blit(main_bread,(0,0))
     elif loc == INGAME:
         move_headmold()
-        #camPos = HEADMOLD.HeadPos
-        print(get_posforscreen(HEADMOLD.HeadPos))
-        screen.blit(HEADMOLD.animation.update(200,200),get_posforscreen(HEADMOLD.HeadPos))
+        camPos = HEADMOLD.HeadPos
+        #print(get_posforscreen(HEADMOLD.HeadPos,200,200))
+        screen.blit(HEADMOLD.animation.update(200,200),get_posforscreen(HEADMOLD.HeadPos,200,200))
+        for mm in micomolds:
+            screen.blit(mm.animation.update(100,100),get_posforscreen2(mm.Pos,100,100))
     pygame.display.flip()
 
     clock.tick(60) #초당 60프레임
 pygame.quit()
-print('도윤이바보멍청이아님이 맞음')
+print('도윤이바보멍청이아님이 맞음 ')
