@@ -140,7 +140,7 @@ def ToTuple(list):
 def AddCamPos(list):
     return [list[0]-camPos[0],list[1]-camPos[1]]
 
-def controlForCenter(list):
+def controlForCenter(list): #위치를 화면 가운데로 만들기 위한 함수
     return [list[0]+screen_width/2,list[1]+screen_height/2]
 
 def controlForCenter2(list,width,height):
