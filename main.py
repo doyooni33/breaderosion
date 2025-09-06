@@ -373,7 +373,8 @@ while running:
         screen.blit(main_bread,(0,0))
     elif loc == INGAME:
         move_headmold(elapsed)
-        camPos = HEADMOLD.HeadPos
+        #camPos = HEADMOLD.HeadPos
+        camPos = [399,399]
         print(camPos)
         print(get_posforscreen(HEADMOLD.HeadPos,HEADMOLDSIZE,HEADMOLDSIZE))
         for bm in babymolds:
@@ -393,7 +394,7 @@ while running:
             screen.blit(a.animation.update(ANTISEPTICSIZE,ANTISEPTICSIZE),get_posforscreen2(a.Pos,ANTISEPTICSIZE,ANTISEPTICSIZE))
         for r in rokets:
             screen.blit(r.get_img(ROKETSIZE,ROKETSIZE),get_posforscreen2(r.Pos,ROKETSIZE,ROKETSIZE))
-        screen.blit(HEADMOLD.animation.update(HEADMOLDSIZE,HEADMOLDSIZE),get_posforscreen(HEADMOLD.HeadPos,BABYMOLDSIZE,BABYMOLDSIZE))
+        screen.blit(HEADMOLD.animation.update(HEADMOLDSIZE,HEADMOLDSIZE),get_posforscreen2(HEADMOLD.HeadPos,BABYMOLDSIZE,BABYMOLDSIZE))
     pygame.display.flip()
 
     clock.tick(60) #초당 60프레임
