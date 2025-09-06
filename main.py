@@ -46,6 +46,12 @@ STD_BABYMOLD_IMG0004 = pygame.image.load('./animation/babymold_standing/babymold
 std_babymold_img0004 = STD_BABYMOLD_IMG0004
 STD_BABYMOLD_IMG0005 = pygame.image.load('./animation/babymold_standing/babymold0005.png')
 std_babymold_img0005 = STD_BABYMOLD_IMG0005
+HEADMOLDROKET_IMG = pygame.image.load('./img/headroket.png')
+headmoldroket_img = HEADMOLDROKET_IMG
+MICOMOLDROKET_IMG = pygame.image.load('./img/micoroket.png')
+micomoldroket_img = MICOMOLDROKET_IMG
+ANTISEPTIC_IMG = pygame.image.load('./img/antiseptic.png')
+antiseptic_img = ANTISEPTIC_IMG
 
 
 
@@ -70,7 +76,16 @@ class animation(type):
         self.anitype = type_
         self.progress = 1
         self.fps = fps
+        self.anilenght = 0
         self.fftime = time.time() #처음 프레임이 나왔던 시간 'f'irst 'f'rame time
+        if self.anitype == self.HEADMOLD_ANI:
+            self.anilenght = 5
+        elif self.anitype == self.MICOMOLD_ANI:
+            self.anilenght = 3
+        elif self.anitype == self.BABYMOLD_ANI:
+            self.anilenght = 5
+        elif self.anitype == self.ANTISEPTIC_ANI:
+            self.anilenght = 1
     def get_animation(self,width,height):
         if self.anitype == self.HEADMOLD_ANI:
             if self.progress == 1:
@@ -93,18 +108,21 @@ class animation(type):
         elif self.anitype == self.BABYMOLD_ANI:
             if self.progress == 1:
                 return pygame.transform.scale(STD_BABYMOLD_IMG0001,(width,height))
-            if self.progress == 2:
+            elif self.progress == 2:
                 return pygame.transform.scale(STD_BABYMOLD_IMG0002,(width,height))
-            if self.progress == 3:
+            elif self.progress == 3:
                 return pygame.transform.scale(STD_BABYMOLD_IMG0003,(width,height))
-            if self.progress == 4:
+            elif self.progress == 4:
                 return pygame.transform.scale(STD_BABYMOLD_IMG0004,(width,height))
-            if self.progress == 5:
+            elif self.progress == 5:
                 return pygame.transform.scale(STD_BABYMOLD_IMG0005,(width,height))
-
+        elif self.anitype == self.ANTISEPTIC_ANI:
+            if self.progress == 1:
+                print((width,height))
+                return pygame.transform.scale(ANTISEPTIC_IMG,(width,height))
     def update(self,width,height):
         if time.time()-self.fftime > 1/self.fps*self.progress:
-            if self.progress >= 3:
+            if self.progress >= self.anilenght:
                 self.progress = 1
                 self.fftime = time.time()
             else:
@@ -141,11 +159,31 @@ class micomold(type): #곰팡이 노비
     def spawn(self):
         babymolds.append(babymold(self.Pos))
 
-class micomoldroket(type):
+class roket(type):
+    def __init__(self,pos,target):
+        self.type = type.LIVING
+        self.Pos = pos
+        self.target:antiseptic = target
+    def update(self,elapsed):
+        self.go(elapsed)
+    def go(self,elapsed):
+        self.Pos = gothere(self.Pos,self.target.Pos,5,elapsed)
+    def get_img(self,width,height):
+        pass
+class micomoldroket(roket):
     def __init__(self,pos,target):
         self.type = type.LIVING
         self.Pos = pos
         self.target = target
+    def get_img(self,width,height):
+        return pygame.transform.scale(MICOMOLDROKET_IMG,(width,height))
+class headmoldroket(roket):
+    def __init__(self,pos,target):
+        self.type = type.LIVING
+        self.Pos = pos
+        self.target = target
+    def get_img(self,width,height):
+        return pygame.transform.scale(HEADMOLDROKET_IMG,(width,height))
 
 class babymold(type):
     def __init__(self,pos):
@@ -172,10 +210,10 @@ class babymold(type):
         if random.randrange(0,2) == 1:
             micomolds.append(micomold(0,self.Pos))
 class antiseptic(type): #방부제
-    def __init__(self):
+    def __init__(self,pos):
         self.type = type.LIVING
-        self.Pos = [0,0]
-        self.animation = animation(3)
+        self.Pos = pos
+        self.animation = animation(animation.ANTISEPTIC_ANI,3)
 class tansuuuuuu(type): #탄수화물
     def __init__(self):
         self.type = type.FOOD
@@ -255,14 +293,18 @@ def get_pxpercell(cell):
     return OneCellPerPx*cell
 
 
+
 HEADMOLDSIZE = get_pxpercell(1)
 MICOMOLDSIZE = get_pxpercell(0.5)
 BABYMOLDSIZE = get_pxpercell(0.3)
+ANTISEPTICSIZE = get_pxpercell(0.5)
+ROKETSIZE = get_pxpercell(0.2)
 
 HEADMOLD = mold()
 micomolds:list[micomold] = [micomold(1,[499,499])]
 babymolds:list[babymold] = [babymold([499,499])]
-antiseptics:list[antiseptic] = []
+antiseptics:list[antiseptic] = [antiseptic([499,499])]
+rokets:list[roket] = [headmoldroket([499,499],antiseptics[0])]
 
 
 camPos = [0,0]
@@ -285,7 +327,12 @@ while running:
             HEADMOLDSIZE = get_pxpercell(1)
             MICOMOLDSIZE = get_pxpercell(0.5)
             BABYMOLDSIZE = get_pxpercell(0.3)
-            print(OneCellPerPx)
+            ROKETSIZE = get_pxpercell(0.2)
+            ANTISEPTICSIZE = get_pxpercell(0.5)
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_f:
+                print("f")
+
 
     screen.fill((100,100,100))
 
@@ -293,17 +340,25 @@ while running:
         screen.blit(main_bread,(0,0))
     elif loc == INGAME:
         move_headmold(elapsed)
-        camPos = HEADMOLD.HeadPos
-        #print(get_posforscreen(HEADMOLD.HeadPos,200,200))
+        #camPos = HEADMOLD.HeadPos
+        print(ANTISEPTICSIZE)
         for bm in babymolds:
             bm.update(elapsed)
         for mm in micomolds:
             mm.update()
-
+        for a in antiseptics:
+            pass
+        for r in rokets:
+            r.update(elapsed)
+            
         for mm in micomolds:
             screen.blit(mm.animation.update(MICOMOLDSIZE,MICOMOLDSIZE),get_posforscreen2(mm.Pos,MICOMOLDSIZE,MICOMOLDSIZE))
         for bm in babymolds:
             screen.blit(bm.animation.update(BABYMOLDSIZE,BABYMOLDSIZE),get_posforscreen2(bm.Pos,BABYMOLDSIZE,BABYMOLDSIZE))
+        for a in antiseptics:
+            screen.blit(a.animation.update(ANTISEPTICSIZE,ANTISEPTICSIZE),get_posforscreen2(a.Pos,ANTISEPTICSIZE,ANTISEPTICSIZE))
+        for r in rokets:
+            screen.blit(r.get_img(ROKETSIZE,ROKETSIZE),get_posforscreen2(r.Pos,ROKETSIZE,ROKETSIZE))
         screen.blit(HEADMOLD.animation.update(HEADMOLDSIZE,HEADMOLDSIZE),get_posforscreen(HEADMOLD.HeadPos,BABYMOLDSIZE,BABYMOLDSIZE))
     pygame.display.flip()
 
