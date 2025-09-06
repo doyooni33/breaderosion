@@ -6,8 +6,7 @@ class a:
 class b(a):
     def a(self):
         print("b")
-a_ = a()
-b__ = b()
-b_ = 1
-if type(a_) == type(b__) :
-    print("a==b")
+a_ = [0,1]
+b__ = a_.copy()
+b__[0] = 2
+print(a_)
