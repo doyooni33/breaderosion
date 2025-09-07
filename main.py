@@ -419,7 +419,7 @@ while running:
             ANTISEPTICSIZE = get_pxpercell(0.4)
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_f:
-                print("f")
+                rokets.append(headmoldroket(HEADMOLD.HeadPos,get_nearmicomold()))
 
 
     screen.fill((100,100,100))
