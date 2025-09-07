@@ -229,7 +229,7 @@ class babymold(type):
     def grow(self):
         babymolds.remove(self)
         if random.randrange(0,2) == 1:
-            micomolds.append(micomold(0,self.Pos))
+            Lmicomolds.append(Lmicomold(0,self.Pos))
 class antiseptic(type): #방부제
     def __init__(self,pos):
         self.type = type.LIVING
@@ -238,7 +238,11 @@ class antiseptic(type): #방부제
         self.target:Lmicomold = get_nearmicomold(self.Pos)
         print(self.target)
     def update(self,elapsed):
-        self.target:Lmicomold = get_nearmicomold(self.Pos)
+        if len(Lmicomolds) >= 1:
+            print(len(Lmicomolds))
+            self.target:Lmicomold = get_nearmicomold(self.Pos)
+        else:
+            self.target = None
         if self.target == None:
             pass
         else:
@@ -377,7 +381,7 @@ class upgrade:
 HEADMOLDSIZE = get_pxpercell(1)
 MICOMOLDSIZE = get_pxpercell(0.5)
 BABYMOLDSIZE = get_pxpercell(0.3)
-ANTISEPTICSIZE = get_pxpercell(0.5)
+ANTISEPTICSIZE = get_pxpercell(0.4)
 ROKETSIZE = get_pxpercell(0.2)
 
 HEADMOLD = mold()
@@ -409,7 +413,7 @@ while running:
             MICOMOLDSIZE = get_pxpercell(0.5)
             BABYMOLDSIZE = get_pxpercell(0.3)
             ROKETSIZE = get_pxpercell(0.2)
-            ANTISEPTICSIZE = get_pxpercell(0.5)
+            ANTISEPTICSIZE = get_pxpercell(0.4)
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_f:
                 print("f")
