@@ -158,8 +158,11 @@ class micomold(type):
         pass
 
 class Dmicomold(micomold):
-    def __init__(self):
+    def __init__(self,pos):
+        self.type = type.LIVING
+        self.Pos = pos
         self.health = -1
+        self.animation = animation(animation.DMICOMOLD_ANI,6)
 class Lmicomold(type): #곰팡이 노비
     def __init__(self,rating,pos):
         self.type = type.LIVING
@@ -174,7 +177,7 @@ class Lmicomold(type): #곰팡이 노비
             self.spawntime = 1000
         if self.health < 0:
             Lmicomolds.remove(self)
-            Dmicomolds.append(Dmicomold())
+            Dmicomolds.append(Dmicomold(self.Pos))
     def spawn(self):
         babymolds.append(babymold(self.Pos))
     def damaged(self,damage):
@@ -229,7 +232,7 @@ class babymold(type):
     def grow(self):
         babymolds.remove(self)
         if random.randrange(0,2) == 1:
-            micomolds.append(micomold(0,self.Pos))
+            Lmicomolds.append(Lmicomold(0,self.Pos))
 class antiseptic(type): #방부제
     def __init__(self,pos):
         self.type = type.LIVING
@@ -238,7 +241,11 @@ class antiseptic(type): #방부제
         self.target:Lmicomold = get_nearmicomold(self.Pos)
         print(self.target)
     def update(self,elapsed):
-        self.target:Lmicomold = get_nearmicomold(self.Pos)
+        if len(Lmicomolds) >= 1:
+            print(len(Lmicomolds))
+            self.target:Lmicomold = get_nearmicomold(self.Pos)
+        else:
+            self.target = None
         if self.target == None:
             pass
         else:
@@ -377,7 +384,7 @@ class upgrade:
 HEADMOLDSIZE = get_pxpercell(1)
 MICOMOLDSIZE = get_pxpercell(0.5)
 BABYMOLDSIZE = get_pxpercell(0.3)
-ANTISEPTICSIZE = get_pxpercell(0.5)
+ANTISEPTICSIZE = get_pxpercell(0.4)
 ROKETSIZE = get_pxpercell(0.2)
 
 HEADMOLD = mold()
@@ -409,7 +416,7 @@ while running:
             MICOMOLDSIZE = get_pxpercell(0.5)
             BABYMOLDSIZE = get_pxpercell(0.3)
             ROKETSIZE = get_pxpercell(0.2)
-            ANTISEPTICSIZE = get_pxpercell(0.5)
+            ANTISEPTICSIZE = get_pxpercell(0.4)
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_f:
                 print("f")
@@ -435,8 +442,10 @@ while running:
         for r in rokets:
             r.update(elapsed)
             
-        for mm in Lmicomolds:
-            screen.blit(mm.animation.update(MICOMOLDSIZE,MICOMOLDSIZE),get_posforscreen(mm.Pos,MICOMOLDSIZE,MICOMOLDSIZE))
+        for lmm in Lmicomolds:
+            screen.blit(lmm.animation.update(MICOMOLDSIZE,MICOMOLDSIZE),get_posforscreen(lmm.Pos,MICOMOLDSIZE,MICOMOLDSIZE))
+        for dmm in Dmicomolds:
+            screen.blit(dmm.animation.update(MICOMOLDSIZE,MICOMOLDSIZE),get_posforscreen(dmm.Pos,MICOMOLDSIZE,MICOMOLDSIZE))
         for bm in babymolds:
             screen.blit(bm.animation.update(BABYMOLDSIZE,BABYMOLDSIZE),get_posforscreen(bm.Pos,BABYMOLDSIZE,BABYMOLDSIZE))
         for a in antiseptics:
