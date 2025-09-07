@@ -189,11 +189,17 @@ class roket(type):
         self.Pos = pos
         self.target:antiseptic = target
     def update(self,elapsed):
-        self.go(elapsed)
+        if self.target != None:
+            self.go(elapsed)
+            self.attack()
     def go(self,elapsed):
         self.Pos = gothere(self.Pos,self.target.Pos,0.2,elapsed)
     def get_img(self,width,height):
         pass
+    def attack(self):
+        if get_distance(self.Pos,self.target.Pos) < 0.2:
+            self.target.damaged(10)
+            rokets.remove(self)
 class micomoldroket(roket):
     def __init__(self,pos,target):
         self.type = type.LIVING
@@ -237,12 +243,13 @@ class antiseptic(type): #방부제
     def __init__(self,pos):
         self.type = type.LIVING
         self.Pos = pos
+        self.health = 100
         self.animation = animation(animation.ANTISEPTIC_ANI,3)
         self.target:Lmicomold = get_nearmicomold(self.Pos)
-        print(self.target)
     def update(self,elapsed):
+        if self.health < 0:
+            antiseptics.remove(self)
         if len(Lmicomolds) >= 1:
-            print(len(Lmicomolds))
             self.target:Lmicomold = get_nearmicomold(self.Pos)
         else:
             self.target = None
@@ -255,7 +262,9 @@ class antiseptic(type): #방부제
         if get_distance(self.Pos,self.target.Pos) < 0.1:
             self.target.damaged(10)
     def move(self,elapsed):
-        self.Pos = gothere(self.Pos,self.target.Pos,0.2,elapsed)
+        self.Pos = gothere(self.Pos,self.target.Pos,0.5,elapsed)
+    def damaged(self,damage):
+        self.health -= damage
 class tansuuuuuu(type): #탄수화물
     def __init__(self):
         self.type = type.FOOD
@@ -278,16 +287,12 @@ def move_headmold(elapsed):
     pressed_key = pygame.key.get_pressed()
     if pressed_key[pygame.K_w]:
         HEADMOLD.w(elapsed)
-        print("w")
     if pressed_key[pygame.K_a]:
         HEADMOLD.a(elapsed)
-        print("a")
     if pressed_key[pygame.K_s]:
         HEADMOLD.s(elapsed)
-        print("s")
     if pressed_key[pygame.K_d]:
         HEADMOLD.d(elapsed)
-        print("d")
 
 def ToTuple(list):
     return (list[0],list[1])
@@ -348,6 +353,27 @@ def get_nearmicomold(Pos_):
         else:
             near = mico
     return near
+
+def get_nearantiseptic(Pos_):
+    if len(antiseptics) > 0:
+        pos = Pos_.copy()
+        nearest = -1
+        near = antiseptics[0]
+        for anti in antiseptics:
+            antipos = anti.Pos.copy()
+            distance_x = abs(pos[0] - antipos[0])
+            distance_y = abs(pos[1] - antipos[1])
+            distance_xy = distance_x**2 + distance_y**2
+            distance_xy = math.sqrt(distance_xy)
+            if nearest > 0:
+                if nearest < distance_xy:
+                    near = anti.copy()
+            else:
+                near = anti
+        return near
+    else:
+        None
+
 class upgrade:
     SRL = 1 #skill reloading 
     SRL_MAX = 5
@@ -392,7 +418,7 @@ Lmicomolds:list[Lmicomold] = [Lmicomold(1,[499,499])]
 Dmicomolds:list[Dmicomold] = []
 babymolds:list[babymold] = [babymold([499,499])]
 antiseptics:list[antiseptic] = [antiseptic([497,497])]
-rokets:list[roket] = [headmoldroket([499,499],antiseptics[0])]
+rokets:list[roket] = []
 
 
 camPos = [0,0]
@@ -419,7 +445,7 @@ while running:
             ANTISEPTICSIZE = get_pxpercell(0.4)
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_f:
-                rokets.append(headmoldroket(HEADMOLD.HeadPos,get_nearmicomold()))
+                rokets.append(headmoldroket(HEADMOLD.HeadPos,get_nearantiseptic(HEADMOLD.HeadPos)))
 
 
     screen.fill((100,100,100))
@@ -432,7 +458,7 @@ while running:
         camPos[0] = get_pxpercell(camPos[0])
         camPos[1] = get_pxpercell(camPos[1])
         camPos = controlForCenter(camPos,screen_width,screen_height)
-        print(camPos,end="cam\n")
+        #print(camPos,end="cam\n")
         for bm in babymolds:
             bm.update(elapsed)
         for mm in Lmicomolds:
@@ -450,10 +476,13 @@ while running:
             screen.blit(bm.animation.update(BABYMOLDSIZE,BABYMOLDSIZE),get_posforscreen(bm.Pos,BABYMOLDSIZE,BABYMOLDSIZE))
         for a in antiseptics:
             screen.blit(a.animation.update(ANTISEPTICSIZE,ANTISEPTICSIZE),get_posforscreen(a.Pos,ANTISEPTICSIZE,ANTISEPTICSIZE))
+        print(len(antiseptics))
+        print(len(rokets))
         for r in rokets:
+            print(get_posforscreen(r.Pos,ROKETSIZE,ROKETSIZE))
             screen.blit(r.get_img(ROKETSIZE,ROKETSIZE),get_posforscreen(r.Pos,ROKETSIZE,ROKETSIZE))
         screen.blit(HEADMOLD.animation.update(HEADMOLDSIZE,HEADMOLDSIZE),get_posforscreen(HEADMOLD.HeadPos,HEADMOLDSIZE,HEADMOLDSIZE))
-        print(get_posforscreen(HEADMOLD.HeadPos,BABYMOLDSIZE,BABYMOLDSIZE),end="head\n\n")
+        #print(get_posforscreen(HEADMOLD.HeadPos,BABYMOLDSIZE,BABYMOLDSIZE),end="head\n\n")
     pygame.display.flip()
 
     clock.tick(60) #초당 60프레임
