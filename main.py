@@ -238,7 +238,6 @@ class antiseptic(type): #방부제
         self.target:Lmicomold = get_nearmicomold(self.Pos)
         print(self.target)
     def update(self,elapsed):
-        self.target:Lmicomold = get_nearmicomold(self.Pos)
         if self.target == None:
             pass
         else:
@@ -387,7 +386,7 @@ babymolds:list[babymold] = [babymold([499,499])]
 antiseptics:list[antiseptic] = [antiseptic([497,497])]
 rokets:list[roket] = [headmoldroket([499,499],antiseptics[0])]
 
-
+rokets=[headmoldroket([499,499],antiseptics[0])]
 camPos = [0,0]
 
 LOBBY = 0
